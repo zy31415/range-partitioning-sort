@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: myjob
+spec:
+  template:
+    spec:
+      containers:
+        - name: range-partitiong-sort
+          image: range-partitioning-sort
+          imagePullPolicy: Never
+          command: ["java", "-cp", "range-partitioning-sort.jar", "Main"]
+          volumeMounts:
+            - mountPath: "/host"
+              name: "host-mount"
+      restartPolicy: OnFailure
+      volumes:
+        - name: "host-mount"
+          hostPath:
+            path: "/host"
