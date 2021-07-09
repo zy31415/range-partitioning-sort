@@ -13,12 +13,12 @@ object Main extends App with LazyLogging {
   val server = new Thread(Server(listener, numOfServers))
   server.start()
 
-  Partition.partition()
+  new Partition().partition()
 
   numOfServers.await()
 
 //  listener.close()
-//  server.join()
+  server.join()
 
   /* todo: time to consider to shutdown the server.
 

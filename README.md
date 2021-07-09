@@ -7,7 +7,7 @@ Reference:
 Database System Concepts (7ed) by Silberschatz etc.
 
 
-Solution:
+## Flow:
 
 1. Start collection service
 
@@ -21,3 +21,18 @@ Solution:
 
 
 4. Sort each partition
+
+## Solutions
+
+* Mount local directory into pod in minicube:
+
+https://stackoverflow.com/questions/48534980/mount-local-directory-into-pod-in-minikube
+
+Command:
+
+`minikube mount ${HOME}/workspace/range-partitioning-sort/test:/host`
+
+This command will expose the host directory under `/host` in minicube.
+
+Then add `volumeMounts` and `volumes` configurations in k8s configuration file.
+

@@ -1,20 +1,59 @@
-apiVersion: batch/v1
-kind: Job
+apiVersion: v1
+kind: Service
 metadata:
-  name: myjob
+  name: default-subdomain
 spec:
-  template:
-    spec:
-      containers:
-        - name: range-partitiong-sort
-          image: range-partitioning-sort
-          imagePullPolicy: Never
-          command: ["java", "-cp", "range-partitioning-sort.jar", "Main"]
-          volumeMounts:
-            - mountPath: "/host"
-              name: "host-mount"
-      restartPolicy: OnFailure
-      volumes:
-        - name: "host-mount"
-          hostPath:
-            path: "/host"
+  selector:
+    name: partition-node
+  clusterIP: None
+  ports:
+    - name: foo # Actually, no port is needed.
+      port: 1234
+      targetPort: 1234
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: node1
+  labels:
+    name: partition-node
+spec:
+  hostname: node1
+  subdomain: default-subdomain
+  containers:
+    - name: range-partitiong-sort
+      image: range-partitioning-sort
+      imagePullPolicy: Never
+      command: ["java", "-cp", "range-partitioning-sort.jar", "Main"]
+      volumeMounts:
+        - mountPath: "/host"
+          name: "host-mount"
+  restartPolicy: OnFailure
+  volumes:
+    - name: "host-mount"
+      hostPath:
+        path: "/host"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: node2
+  labels:
+    name: partition-node
+spec:
+  hostname: node2
+  subdomain: default-subdomain
+  containers:
+    - name: range-partitiong-sort
+      image: range-partitioning-sort
+      imagePullPolicy: Never
+      command: ["java", "-cp", "range-partitioning-sort.jar", "Main"]
+      volumeMounts:
+        - mountPath: "/host"
+          name: "host-mount"
+  restartPolicy: OnFailure
+  volumes:
+    - name: "host-mount"
+      hostPath:
+        path: "/host"
+
