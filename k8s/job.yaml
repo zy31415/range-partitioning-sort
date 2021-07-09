@@ -56,4 +56,26 @@ spec:
     - name: "host-mount"
       hostPath:
         path: "/host"
-
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: node3
+  labels:
+    name: partition-node
+spec:
+  hostname: node3
+  subdomain: default-subdomain
+  containers:
+    - name: range-partitiong-sort
+      image: range-partitioning-sort
+      imagePullPolicy: Never
+      command: ["java", "-cp", "range-partitioning-sort.jar", "Main"]
+      volumeMounts:
+        - mountPath: "/host"
+          name: "host-mount"
+  restartPolicy: OnFailure
+  volumes:
+    - name: "host-mount"
+      hostPath:
+        path: "/host"

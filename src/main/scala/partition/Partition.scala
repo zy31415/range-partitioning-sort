@@ -8,7 +8,10 @@ import scala.collection.mutable
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
-class Partition extends LazyLogging {
+case class Partition(numOfServers: Int, minValue: Int = 0, maxValue: Int = 100) extends LazyLogging {
+
+  private val range: Int = (maxValue - minValue) / numOfServers
+  private val dividers: Seq[Int] = (0 until numOfServers).map(minValue + _ * range) :+ maxValue
 
   private val writers = mutable.HashMap.empty[Int, Writer]
 
@@ -18,14 +21,9 @@ class Partition extends LazyLogging {
     // partitioning
     for (line <- source.getLines()) {
       val record = line.toInt
-      println(record)
-
-      record match {
-        case r if r < 50 =>
-          getWriter(1).write(s"$record\n")
-        case _ =>
-          getWriter(2).write(s"$record\n")
-      }
+      val p = getPartition(record)
+      logger.debug(s"Get record: $record, partitioned to $p")
+      getWriter(p).write(s"$record\n")
     }
 
     writers.foreach {case (id, w) => w.write(s"STOP node$id")}
@@ -56,5 +54,13 @@ class Partition extends LazyLogging {
       writers(nodeId) = w
       w
     }
+  }
+
+  private def getPartition(record: Int): Int = {
+    var partition = 1
+    while (record > dividers(partition) && partition < numOfServers) {
+      partition += 1
+    }
+    partition
   }
 }

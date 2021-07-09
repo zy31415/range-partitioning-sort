@@ -13,7 +13,7 @@ object Main extends App with LazyLogging {
   val server = new Thread(Server(listener, numOfServers))
   server.start()
 
-  new Partition().partition()
+  Partition(3).partition()
 
   numOfServers.await()
 
